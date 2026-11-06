@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-slate-700;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-surface-900 text-slate-100 font-sans antialiased;
+    background-image: radial-gradient(ellipse at top, #1e3a8a08 0%, transparent 70%);
+    min-height: 100vh;
+  }
+  ::selection {
+    @apply bg-primary-600/40 text-white;
+  }
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
+
+@layer components {
+  /* ─── Glass card ─────────────────────────────────────── */
+  .glass {
+    @apply bg-surface-800/60 backdrop-blur-md border border-slate-700/50;
+  }
+  .glass-hover {
+    @apply glass hover:bg-surface-800/80 hover:border-slate-600/70 transition-all duration-200;
+  }
+
+  /* ─── Buttons ────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center gap-2 font-medium rounded-lg transition-all duration-200
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           focus-visible:ring-offset-surface-900 disabled:opacity-50 disabled:cursor-not-allowed
+           active:scale-95 select-none;
+  }
+  .btn-sm  { @apply btn px-3 py-1.5 text-sm; }
+  .btn-md  { @apply btn px-4 py-2 text-sm; }
+  .btn-lg  { @apply btn px-6 py-3 text-base; }
+
+  .btn-primary {
+    @apply btn-md bg-primary-600 hover:bg-primary-500 text-white focus-visible:ring-primary-500
+           shadow-md hover:shadow-glow;
+  }
+  .btn-secondary {
+    @apply btn-md bg-slate-700 hover:bg-slate-600 text-slate-100 focus-visible:ring-slate-500;
+  }
+  .btn-danger {
+    @apply btn-md bg-red-600 hover:bg-red-500 text-white focus-visible:ring-red-500;
+  }
+  .btn-ghost {
+    @apply btn-md bg-transparent hover:bg-slate-800 text-slate-300 hover:text-white
+           focus-visible:ring-slate-500;
+  }
+  .btn-outline {
+    @apply btn-md border border-slate-600 hover:border-primary-500 bg-transparent
+           text-slate-300 hover:text-white hover:bg-primary-500/10 focus-visible:ring-primary-500;
+  }
+  .btn-success {
+    @apply btn-md bg-emerald-600 hover:bg-emerald-500 text-white focus-visible:ring-emerald-500;
+  }
+
+  /* ─── Form inputs ────────────────────────────────────── */
+  .input {
+    @apply block w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2
+           text-slate-100 placeholder-slate-500
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all duration-200 text-sm;
+  }
+  .input-error {
+    @apply border-red-500 focus:ring-red-500;
+  }
+  .label {
+    @apply block text-sm font-medium text-slate-300 mb-1;
+  }
+  .error-msg {
+    @apply text-red-400 text-xs mt-1;
+  }
+
+  /* ─── Cards ──────────────────────────────────────────── */
+  .card {
+    @apply bg-surface-800 border border-slate-700/60 rounded-xl shadow-card;
+  }
+  .card-hover {
+    @apply card hover:border-primary-500/40 hover:shadow-card-hover hover:-translate-y-0.5
+           transition-all duration-300 cursor-pointer;
+  }
+
+  /* ─── Badges ─────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-available  { @apply badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+  .badge-borrowed   { @apply badge bg-amber-500/20  text-amber-400  border border-amber-500/30; }
+  .badge-reserved   { @apply badge bg-blue-500/20   text-blue-400   border border-blue-500/30; }
+  .badge-maintenance{ @apply badge bg-red-500/20    text-red-400    border border-red-500/30; }
+  .badge-pending    { @apply badge bg-yellow-500/20 text-yellow-400 border border-yellow-500/30; }
+  .badge-approved   { @apply badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+  .badge-cancelled  { @apply badge bg-slate-500/20  text-slate-400  border border-slate-500/30; }
+  .badge-fulfilled  { @apply badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30; }
+  .badge-active     { @apply badge bg-blue-500/20   text-blue-400   border border-blue-500/30; }
+  .badge-returned   { @apply badge bg-slate-500/20  text-slate-400  border border-slate-500/30; }
+  .badge-overdue    { @apply badge bg-red-500/20    text-red-400    border border-red-500/30; }
+  .badge-admin      { @apply badge bg-purple-500/20 text-purple-400 border border-purple-500/30; }
+  .badge-librarian  { @apply badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30; }
+  .badge-student    { @apply badge bg-sky-500/20    text-sky-400    border border-sky-500/30; }
+
+  /* ─── Skeleton loaders ───────────────────────────────── */
+  .skeleton {
+    @apply bg-slate-700/50 rounded animate-pulse;
+    background-size: 200% 100%;
+  }
+
+  /* ─── Section headings ───────────────────────────────── */
+  .section-title {
+    @apply font-display text-2xl font-bold text-white;
+  }
+  .section-subtitle {
+    @apply text-slate-400 text-sm mt-1;
+  }
+
+  /* ─── Dividers ───────────────────────────────────────── */
+  .divider {
+    @apply border-t border-slate-700/50 my-6;
+  }
+
+  /* ─── Stat card ──────────────────────────────────────── */
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1;
+  }
+
+  /* ─── Page container ─────────────────────────────────── */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  /* ─── Admin layout ───────────────────────────────────── */
+  .admin-layout {
+    @apply flex min-h-[calc(100vh-4rem)];
+  }
+  .admin-content {
+    @apply flex-1 p-6 min-w-0;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-accent-light bg-clip-text text-transparent;
+  }
+  .bg-glass {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .animate-in {
+    @apply animate-fade-in;
+  }
+}

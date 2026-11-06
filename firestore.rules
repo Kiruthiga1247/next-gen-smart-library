@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ─────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Role is stored in users/{uid}.role — never in auth token directly
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isLibrarian() {
+      return isSignedIn() && getUserRole() in ['librarian', 'admin'];
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == 'admin';
+    }
+
+    // ─── Users ────────────────────────────────────────────────
+    match /users/{userId} {
+      // Anyone signed in can read their own profile
+      allow read: if isOwner(userId) || isLibrarian();
+
+      // On create: only the auth user can create their own doc, role MUST be 'student'
+      allow create: if isOwner(userId)
+        && request.resource.data.role == 'student'
+        && request.resource.data.keys().hasAll(['displayName', 'email', 'role', 'createdAt']);
+
+      // Students can update only safe fields (not role)
+      allow update: if isOwner(userId)
+        && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+        || isAdmin();
+
+      // Only admin can delete user docs
+      allow delete: if isAdmin();
+    }
+
+    // ─── Books ────────────────────────────────────────────────
+    match /books/{bookId} {
+      allow read: if true; // Public catalogue
+      allow create, update, delete: if isLibrarian();
+    }
+
+    // ─── Book Copies ──────────────────────────────────────────
+    match /bookCopies/{copyId} {
+      allow read: if true; // Locations are public
+      allow create, update, delete: if isLibrarian();
+    }
+
+    // ─── Reservations ─────────────────────────────────────────
+    match /reservations/{reservationId} {
+      // Student can read their own; librarians can read all
+      allow read: if isSignedIn() && (
+        resource.data.studentId == request.auth.uid || isLibrarian()
+      );
+
+      // Student can create if the studentId matches their uid
+      allow create: if isSignedIn()
+        && request.resource.data.studentId == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // Students can cancel their own pending/approved reservations
+      allow update: if isSignedIn() && (
+        (resource.data.studentId == request.auth.uid
+          && request.resource.data.status == 'cancelled'
+          && resource.data.status in ['pending', 'approved'])
+        || isLibrarian()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ─── Loans ────────────────────────────────────────────────
+    match /loans/{loanId} {
+      allow read: if isSignedIn() && (
+        resource.data.studentId == request.auth.uid || isLibrarian()
+      );
+      // Only librarians can create/update loans (issue/return)
+      allow create, update: if isLibrarian();
+      allow delete: if isAdmin();
+    }
+
+    // ─── Reviews ──────────────────────────────────────────────
+    match /reviews/{reviewId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.studentId == request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment.size() >= 10;
+
+      // Owner can edit/delete their review; admin can delete any
+      allow update: if isOwner(resource.data.studentId);
+      allow delete: if isOwner(resource.data.studentId) || isAdmin();
+    }
+
+    // ─── Audit Logs ───────────────────────────────────────────
+    match /auditLogs/{logId} {
+      allow read: if isLibrarian();
+      allow create: if isSignedIn(); // Any signed-in user can write audit entries
+      allow update, delete: if false; // Immutable
+    }
+  }
+}
